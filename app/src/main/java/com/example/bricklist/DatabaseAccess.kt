@@ -34,11 +34,29 @@ class DatabaseAccess(context: Context) {
     }
 
     fun getColors(): String {
-        cursor = db?.rawQuery("SELECT Name FROM Colors", arrayOf())
+        cursor = db?.rawQuery("SELECT Name FROM Colors", null)
         val buffer = StringBuffer()
         while (cursor?.moveToNext()!!) {
-            buffer.append("" + cursor?.getString(0))
+            buffer.append("" + cursor?.getString(0) + "\n")
         }
+        return buffer.toString()
+    }
+
+    fun addInventory(id: Int, name: String, parts: ArrayList<Inventory>): String {
+        // id, name, active, lastAccessed
+        val values = ContentValues()
+        values.put("id", id)
+        values.put("Name", name)
+        values.put("Active", 1)
+        values.put("LastAccessed", 0)
+        val x = db?.insert("Inventories", null, values)
+
+        cursor = db?.rawQuery("SELECT Name FROM Inventories", null)
+        val buffer = StringBuffer()
+        while (cursor?.moveToNext()!!) {
+            buffer.append("" + cursor?.getString(0) + "\n")
+        }
+        buffer.append("\nValue of insert: " + x.toString())
         return buffer.toString()
     }
 

@@ -3,6 +3,8 @@ package com.example.bricklist
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import com.example.bricklist.DatabaseAccess
+import com.example.bricklist.R
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -15,9 +17,7 @@ class MainActivity : AppCompatActivity() {
     fun queryOnClick(v: View) {
         val databaseAccess = DatabaseAccess(this).getInstance(applicationContext)
         databaseAccess?.open()
-
         result.text = databaseAccess?.getColors()
-
         databaseAccess?.close()
     }
 
