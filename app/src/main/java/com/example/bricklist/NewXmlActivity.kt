@@ -7,6 +7,9 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.preference.PreferenceManager
+import com.example.bricklist.database.DatabaseAccess
+import com.example.bricklist.models.InventoriesPart
 import kotlinx.android.synthetic.main.activity_new_xml.*
 import org.w3c.dom.Document
 import org.w3c.dom.Element
@@ -22,25 +25,29 @@ import javax.xml.parsers.DocumentBuilderFactory
 
 class NewXmlActivity : AppCompatActivity() {
 
-    private val fileName: String = "temp.xml"
     private var id: String = "0"
-    private var link: String = "http://fcds.cs.put.poznan.pl/MyWeb/BL/"
+    private val fileName: String = "temp.xml"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_xml)
 
-        addButton.isEnabled = true
+        checkButton.isEnabled = true
+        addButton.isEnabled = false
+
+        numberText.isEnabled = true
         projectNameText.isEnabled = true
-        // by default add button disabled
+
     }
 
     fun load(v: View) {
         val bg = BgTask()
 
-        // get set's ID
         // get config's link
         id = numberText.text.toString()
+        val link = PreferenceManager.getDefaultSharedPreferences(applicationContext).getString("url", "http://fcds.cs.put.poznan.pl/MyWeb/BL/")
+
+        // link = .text.toString()
         bg.execute(id, link)
     }
 
@@ -51,13 +58,22 @@ class NewXmlActivity : AppCompatActivity() {
             return
         }
 
-        textView.text = loadData()
-
-        // database add to INVENTORIES
-        // database add many to INVENTORIES PART
-
-
+        when (val result = loadData()) {
+            "-1" -> {
+                textView.text = ("Project with given ID already exists.")
+            }
+            "Load Error" -> {
+                textView.text = result
+            }
+            else -> {
+                textView.text = ("Added project with id: $id. \n" +
+                                 "Loaded $result new elements.")
+            }
+        }
         Toast.makeText(applicationContext, "Added project id: $id, name: ", Toast.LENGTH_SHORT).show()
+
+        projectNameText.isEnabled = false
+        addButton.isEnabled = false
     }
 
     private fun loadData(): String {
@@ -75,14 +91,14 @@ class NewXmlActivity : AppCompatActivity() {
 
                 val items: NodeList = xmlDoc.getElementsByTagName("ITEM")
 
-                val partsArray = ArrayList<Inventory>()
+                val partsArray = ArrayList<InventoriesPart>()
 
                 for (i in 0 until items.length) {
                     val itemNode: Node = items.item(i)
 
                     if (itemNode.nodeType == Node.ELEMENT_NODE) {
 
-                        val part = Inventory()
+                        val part = InventoriesPart()
 
                         val elem = itemNode as Element
                         val children = elem.childNodes
@@ -121,7 +137,10 @@ class NewXmlActivity : AppCompatActivity() {
                         partsArray.add(part)
                     }
                 }
-                val databaseAccess = DatabaseAccess(this).getInstance(applicationContext)
+                Toast.makeText(applicationContext, "Size: ${partsArray.size}", Toast.LENGTH_LONG).show()
+                val databaseAccess = DatabaseAccess(
+                    this
+                ).getInstance(applicationContext)
                 databaseAccess?.open()
                 result = databaseAccess?.addInventory(id.toInt(), projectNameText.text.toString(), partsArray).toString()
                 databaseAccess?.close()
@@ -129,11 +148,9 @@ class NewXmlActivity : AppCompatActivity() {
         }
 
         return if (result.isNotEmpty()) {
-            Toast.makeText(applicationContext,"File is good.",Toast.LENGTH_SHORT).show()
             result
         } else {
-            Toast.makeText(applicationContext,"File could not be loaded",Toast.LENGTH_SHORT).show()
-            "File could not be loaded"
+            "Load Error"
         }
     }
 
@@ -154,12 +171,14 @@ class NewXmlActivity : AppCompatActivity() {
             super.onPostExecute(result)
             // unlock Add button
             if (result.equals("Success")) {
-//                addButton.isEnabled = false
-//                checkButton.isEnabled = false
-//                numberText.isEnabled = false
+                addButton.isEnabled = true
+                checkButton.isEnabled = false
+                numberText.isEnabled = false
                 Toast.makeText(applicationContext,"Success", Toast.LENGTH_SHORT).show()
             } else {
-//                addButton.isEnabled = false
+                addButton.isEnabled = false
+                checkButton.isEnabled = true
+                numberText.isEnabled = true
                 Toast.makeText(applicationContext,"Error: $result", Toast.LENGTH_SHORT).show()
             }
         }
