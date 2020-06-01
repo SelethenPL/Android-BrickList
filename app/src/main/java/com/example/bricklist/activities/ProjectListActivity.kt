@@ -1,14 +1,17 @@
-package com.example.bricklist
+package com.example.bricklist.activities
 
 import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.TableRow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.preference.PreferenceManager
+import com.example.bricklist.R
 import com.example.bricklist.database.DatabaseAccess
 import kotlinx.android.synthetic.main.activity_project_list.*
 
@@ -21,6 +24,23 @@ class ProjectListActivity : AppCompatActivity() {
         showProjects()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.main_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            R.id.settings -> {
+                val intent = Intent(applicationContext, SettingsActivity::class.java)
+                startActivity(intent)
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+
     fun addNewProject(v: View) {
         // Here do transfer to ProjectViewActivity
         val intent = Intent(applicationContext, NewXmlActivity::class.java)
@@ -32,7 +52,7 @@ class ProjectListActivity : AppCompatActivity() {
 
         val databaseAccess = DatabaseAccess(this).getInstance(applicationContext)
         databaseAccess?.open()
-        val items = databaseAccess?.getProjectList(archived)!!
+        val items = databaseAccess?.getProjectList(!archived)!!
         databaseAccess.close()
 
         for (i in items) {

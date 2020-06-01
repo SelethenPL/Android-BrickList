@@ -1,8 +1,9 @@
-package com.example.bricklist
+package com.example.bricklist.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceFragmentCompat
+import com.example.bricklist.R
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -11,7 +12,10 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(R.layout.settings_activity)
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.settings, SettingsFragment())
+            .replace(
+                R.id.settings,
+                SettingsFragment()
+            )
             .commit()
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)

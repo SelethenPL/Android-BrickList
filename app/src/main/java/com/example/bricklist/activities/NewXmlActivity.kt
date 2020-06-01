@@ -1,4 +1,4 @@
-package com.example.bricklist
+package com.example.bricklist.activities
 
 import android.annotation.SuppressLint
 import android.os.AsyncTask
@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.preference.PreferenceManager
+import com.example.bricklist.R
 import com.example.bricklist.database.DatabaseAccess
 import com.example.bricklist.models.InventoriesPart
 import kotlinx.android.synthetic.main.activity_new_xml.*

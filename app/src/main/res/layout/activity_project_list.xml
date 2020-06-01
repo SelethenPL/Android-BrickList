@@ -6,7 +6,8 @@
     android:layout_weight="1"
     android:scrollbars="none"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ProjectPartsShowActivity">
+    tools:context=".activities.ProjectPartsShowActivity">
+
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
